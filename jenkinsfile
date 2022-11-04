@@ -17,6 +17,24 @@ pipeline {
 				}
 			}
 		}
+		stage('Deploy to kubernetes cluster'){
+			steps{
+				sh "chmod +x changeTag.sh"
+				sh "./changeTag.sh ${DOCKER_TAG}"
+				sshagent(['login-to-minikube']) {
+					sh "scp -o StrictHostKeyChecking=no services.yml node-app-pod.yml ubuntu@192.168.0.120:/home/ubuntu/"
+					script{
+						try{
+							sh "ssh ubuntu@192.168.0.120 kubectl apply -f ."
+						}catch(error){
+							sh "ssh ubuntu@192.168.0.120 kubectl create -f ."
+						}
+					}
+				}
+			}
+		}
+   }
+}
    }
 }
 def getDockerTag(){
