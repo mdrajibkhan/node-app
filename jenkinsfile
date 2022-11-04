@@ -17,13 +17,13 @@ pipeline {
 				}
 			}
 		}
-		stage('Login to minikube server'){
-			steps{
-				sshagent(['login-to-minikube']) {
-				    sh "scp -o StrictHostKeyChecking=no services.yml node-app-pod.yml ubuntu@192.168.0.120:/home/ubuntu/"
-				}
-			}
-		}
+		stage('Login to stating server') {
+            steps {
+                sshagent(['login-to-minikube']) {
+                     sh 'ssh -o StrictHostKeyChecking=no ubuntu@192.168.0.120'
+                    }
+            }
+        }
    }
 }
 def getDockerTag(){
