@@ -11,25 +11,9 @@ pipeline {
         }
 		stage('Push Image to Docker Hub'){
 			steps{
-				withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerhub-PWD')]) {
-					sh "docker login -u mdrajibkhan -p ${dockerhub-PWD}"
+				withCredentials([string(credentialsId: 'dockerhubPWD', variable: 'dockerhubPWD')]) {
+					sh "docker login -u mdrajibkhan -p ${dockerhubPWD}"
 					sh "docker push mdrajibkhan/nodeapp:${DOCKER_TAG}"
-				}
-			}
-		}
-		stage('Deploy to kubernetes cluster'){
-			steps{
-				sh "chmod +x changeTag.sh"
-				sh "./changeTag.sh ${DOCKER_TAG}"
-				sshagent(['login-to-minikube']) {
-					sh "scp -o StrictHostKeyChecking=no services.yml node-app-pod.yml ubuntu@192.168.0.120:/home/ubuntu/"
-					script{
-						try{
-							sh "ssh ubuntu@192.168.0.120 kubectl apply -f ."
-						}catch(error){
-							sh "ssh ubuntu@192.168.0.120 kubectl create -f ."
-						}
-					}
 				}
 			}
 		}
