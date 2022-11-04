@@ -9,6 +9,14 @@ pipeline {
                 sh "docker build . -t mdrajibkhan/nodeapp:${DOCKER_TAG} "
             }
         }
+		stage('Push Image to Docker Hub'){
+			steps{
+				withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerhub-PWD')]) {
+					sh "docker login -u mdrajibkhan -p ${dockerhub-PWD}"
+					sh "docker push mdrajibkhan/nodeapp:${DOCKER_TAG}"
+				}
+			}
+		}
    }
 }
 def getDockerTag(){
